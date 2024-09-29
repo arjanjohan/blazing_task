@@ -1,0 +1,91 @@
+### Disperse ETH and ERC20 tokens to multiple recipients as values
+POST http://localhost:3030/disperse
+
+{
+    "sender": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "recipients": [
+        "0x199d51a2Be04C65f325908911430E6FF79a15ce3",
+        "0x6d0abaf65AfAA747997b07459e17f6A5d726b375"
+    ],
+    "amounts": [
+        [4500000000, 500000000], [100000000, 10000000], [0, 100000000], [100000000, 0]
+    ],
+    "tokens": [
+        "0x0000000000000000000000000000000000000000",
+        "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+    ],
+    "is_percentage": false
+}
+
+### Disperse ETH and ERC20 tokens to multiple recipients as percentages
+POST http://localhost:3030/disperse
+
+{
+    "sender": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "recipients": [
+        "0x199d51a2Be04C65f325908911430E6FF79a15ce3",
+        "0x6d0abaf65AfAA747997b07459e17f6A5d726b375"
+    ],
+    "amounts": [
+        [0, 50], [10, 10], [0, 100], [100, 0]
+    ],
+    "tokens": [
+        "0x0000000000000000000000000000000000000000",
+        "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+    ],
+    "is_percentage": true
+}
+
+
+### Collect ETH and ERC20 tokens from multiple senders as value
+POST http://localhost:3030/collect
+
+{
+    "recipient": "0x199d51a2Be04C65f325908911430E6FF79a15ce3",
+    "senders": [
+        "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+    ],
+    "amounts": [
+        [5000000000000, 5000000000000],
+        [500000, 500000],
+        [500000, 500000],
+        [500000, 500000]
+    ],
+    "tokens": [
+        "0x0000000000000000000000000000000000000000",
+        "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+        ],
+    "is_percentage": false
+}
+
+
+### Collect ETH and ERC20 tokens from multiple senders as percentage
+POST http://localhost:3030/collect
+
+{
+    "recipient": "0x199d51a2Be04C65f325908911430E6FF79a15ce3",
+    "senders": [
+        "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+    ],
+    "amounts": [
+        [40, 20],
+        [40, 30],
+        [20, 10],
+        [30, 40]
+    ],
+    "tokens": [
+        "0x0000000000000000000000000000000000000000",
+        "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+        ],
+    "is_percentage": true
+}

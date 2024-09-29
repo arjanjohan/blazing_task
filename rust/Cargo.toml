@@ -1,0 +1,15 @@
+[package]
+name = "blazing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy = { version = "0.3.6", features = ["full", 
+    "node-bindings", "json"] }
+eyre = "0.6.12"
+tokio = { version = "1", features = ["full", "rt-multi-thread"] }
+warp = "0.3"
+
+bytes = "1.0"
+serde = "1.0.210"
+serde_json = "1.0.128"
