@@ -131,14 +131,8 @@ async fn collect(
                 ._0;
 
             // Calculate actual amount, and replace the % value with the actual amount
-            let amount = if data.is_percentage {
-                let percentage = data.amounts[token_index][sender_index];
-                let calculated_amount = (balance * percentage) / U256::from(100);
-                data.amounts[token_index][sender_index] = calculated_amount;
-                calculated_amount
-            } else {
-                data.amounts[token_index][sender_index]
-            };
+            let amount = calculate_amount(data.is_percentage, balance, data.amounts[token_index][sender_index])?;
+            data.amounts[token_index][sender_index] = amount;
 
             if balance < amount {
                 return Err(warp::reject::custom(InsufficientBalanceError));
@@ -173,14 +167,8 @@ async fn collect(
             })?;
 
             // Calculate actual amount, and replace the % value with the actual amount
-            let amount = if data.is_percentage {
-                let percentage = data.amounts[eth_index][sender_index];
-                let calculated_amount = (eth_balance * percentage) / U256::from(100);
-                data.amounts[eth_index][sender_index] = calculated_amount;
-                calculated_amount
-            } else {
-                data.amounts[eth_index][sender_index]
-            };
+            let amount = calculate_amount(data.is_percentage, eth_balance, data.amounts[eth_index][sender_index])?;
+            data.amounts[eth_index][sender_index] = amount;
 
             // Skip zero amounts, which can happen if not all senders are sending ETH
             if !amount.is_zero() {
@@ -257,11 +245,10 @@ async fn disperse(
             })?
             ._0;
 
-        let actual_amounts = calculate_actual_amounts(
-            data.is_percentage,
-            data.amounts[token_index].clone(),
-            balance,
-        );
+        let actual_amounts = data.amounts[token_index]
+            .iter()
+            .map(|&amount| calculate_amount(data.is_percentage, balance, amount))
+            .collect::<Result<Vec<U256>, _>>()?;
 
         if data.is_percentage {
             data.amounts[token_index] = actual_amounts.clone();
@@ -298,11 +285,10 @@ async fn disperse(
             eprintln!("Failed to get ETH balance: {}", e);
             warp::reject::custom(TransactionError)
         })?;
-        let actual_amounts = calculate_actual_amounts(
-            data.is_percentage,
-            data.amounts[eth_index].clone(),
-            eth_balance,
-        );
+        let actual_amounts = data.amounts[eth_index]
+            .iter()
+            .map(|&amount| calculate_amount(data.is_percentage, eth_balance, amount))
+            .collect::<Result<Vec<U256>, _>>()?;
 
         if data.is_percentage {
             data.amounts[eth_index] = actual_amounts.clone();
@@ -348,13 +334,20 @@ async fn disperse(
     Ok(warp::reply::json(&tx_hash))
 }
 
-fn calculate_actual_amounts(is_percentage: bool, amounts: Vec<U256>, balance: U256) -> Vec<U256> {
+fn calculate_amount(
+    is_percentage: bool,
+    balance: U256,
+    input_amounts: U256,
+) -> Result<U256, warp::Rejection> {
     if is_percentage {
-        amounts
-            .iter()
-            .map(|&percentage| (balance * percentage) / U256::from(100))
-            .collect()
+        balance
+            .checked_mul(input_amounts)
+            .and_then(|v| v.checked_div(U256::from(100)))
+            .ok_or_else(|| {
+                eprintln!("Overflow in percentage calculation");
+                warp::reject::custom(TransactionError)
+            })
     } else {
-        amounts
+        Ok(input_amounts)
     }
 }
